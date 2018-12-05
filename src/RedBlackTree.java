@@ -137,11 +137,14 @@ public class RedBlackTree<Key extends Comparable<Key>> {
 
 
 	public RedBlackTree.Node<String> getSibling(RedBlackTree.Node<String> n){
-		if(n == n.parent.leftChild) {
-			return n.parent.rightChild;
-		} else {
-			return n.parent.rightChild;
+		if(n.parent != null && n.parent.leftChild != null && n.parent.rightChild != null) {
+			if(n == n.parent.leftChild) {
+				return n.parent.rightChild;
+			} else {
+				return n.parent.rightChild;
+			}
 		}
+		return null;
 	}
 
 
@@ -192,10 +195,10 @@ public class RedBlackTree<Key extends Comparable<Key>> {
 		}
 
 		//3. Correct double red problems
-		if(current != null && current != root && current.parent.isRed) {
+		if(current != null && parent != null && grandparent != null && current != root && parent.isRed) {
 
 			//3.1 if Aunt is black or empty
-			if(!aunt.isRed || aunt == null) {
+			if(aunt == null || !aunt.isRed) {
 
 				//3.1.A parent is left child of grandparent and current is right child of parent
 				if(parent == grandparent.leftChild
@@ -203,7 +206,7 @@ public class RedBlackTree<Key extends Comparable<Key>> {
 					rotateLeft(parent);
 					fixTree(parent);
 				} 
-				//3.1.B parent is right child of grandparenct and current if left child of parent
+				//3.1.B parent is right child of grandparent and current if left child of parent
 				else if (parent == grandparent.rightChild 
 						&& current == parent.leftChild) {
 					rotateRight(parent);
