@@ -3,11 +3,15 @@ public class RedBlackTree<Key extends Comparable<Key>> {
 
 	public static void main(String[] args) {
 		RedBlackTree<String> a = new RedBlackTree<String>();
-		a.insert("Hello");
-		a.insert("World");
-		a.insert("Elana");
-		a.insert("Olson");
-		System.out.println("----------");
+		a.insert("Apple");
+		a.insert("Arizona");
+		a.insert("Aaron");
+		a.insert("Banana");
+		a.insert("Carrot");
+		a.insert("Dog");
+		a.insert("Beaver");
+		a.insert("Armadillo");
+		a.insert("Gorilla");
 		a.printTree();
 	}
 
@@ -64,27 +68,34 @@ public class RedBlackTree<Key extends Comparable<Key>> {
 
 	public void printTree(){  //preorder: visit, go left, go right
 		RedBlackTree.Node<String> currentNode = root;	
-		printTree(currentNode);
+		printTree("", currentNode, true, "");
 	}
 
-	public void printTree(RedBlackTree.Node<String> node){
-		System.out.println(node.key);
-		if (node.isLeaf()){
+	private void printTree(String prefix, Node node, boolean isTail, String child) {
+		if(node == null) {
 			return;
 		}
+
+		System.out.println(prefix + (isTail ? "└── " : "├── ") + node.key + " " + child + (node.isRed ? " (red)" : ""));
+
 		if(node.leftChild != null) {
-			printTree(node.leftChild);
+			printTree(prefix + (isTail ? "    " : "│   "), node.leftChild, false, "     = (L)");
 		}
+
 		if(node.rightChild != null) {
-			printTree(node.rightChild);
-		}	
+			printTree(prefix + (isTail ? "    " : "│   "), node.rightChild, false, "     = (R)");
+		}
+
+		if(node.isLeaf()) {
+			isTail = true;
+		}
 	}
 
 	// place a new node in the RB tree with data the parameter and color it red. 
 	public void addNode(String data){  	//this < that  <0.  this > that  >0
 		if (root == null) {
 			root = new Node(data);
-			System.out.println(root.key + " ("+ ifIsRed(root) + ") = root");
+			//System.out.println(root.key + " ("+ ifIsRed(root) + ") = root");
 		}
 
 		Node current = root;
@@ -95,26 +106,26 @@ public class RedBlackTree<Key extends Comparable<Key>> {
 				current.key = data;
 				return;
 			} 
+			//current > data
+			else if (comparisonResult > 0){
+				if (current.leftChild == null) {
+					current.leftChild = new Node(data);
+					fixTree(current.leftChild);
+					//System.out.println(current.leftChild.key + " ("+ ifIsRed(current.leftChild) + ") = leftChild of " + current.key);
+					break;
+				}
+				current = current.leftChild;
+			}
 			//current < data
 			else if (comparisonResult < 0) {
 				if (current.rightChild == null) {
 					current.rightChild = new Node(data);
 					fixTree(current.rightChild);
-					System.out.println(current.rightChild.key + " ("+ ifIsRed(current.rightChild) + ") = rightChild of " + current.key);
+					//System.out.println(current.rightChild.key + " ("+ ifIsRed(current.rightChild) + ") = rightChild of " + current.key);
 					break;
 				}
 				current = current.rightChild;
 			} 
-			//current > data
-			else {
-				if (current.leftChild == null) {
-					current.leftChild = new Node(data);
-					fixTree(current.leftChild);
-					System.out.println(current.leftChild.key + " ("+ ifIsRed(current.leftChild) + ") = leftChild of " + current.key);
-					break;
-				}
-				current = current.leftChild;
-			}
 
 		}
 	}	
@@ -122,7 +133,7 @@ public class RedBlackTree<Key extends Comparable<Key>> {
 	public void insert(String data){
 		addNode(data);	
 	}
-	
+
 	public String ifIsRed(Node node) {
 		if(node.isRed) {
 			return "red";
@@ -179,18 +190,18 @@ public class RedBlackTree<Key extends Comparable<Key>> {
 		Node aunt = getAunt(current);
 		Node parent = current.parent;
 		Node grandparent = getGrandparent(current);
-		
+
 		//Set color to red
 		current.isRed = true;
-		
+
 		//1. If current node is root
 		if(current == root) {
 			current.isRed = false;
 			return;
 		}
-		
+
 		//2. If parent is black, the tree is a balanced RedBlackTree. 
-		if(!parent.isRed) {
+		if(parent != null && !parent.isRed) {
 			return;
 		}
 
@@ -229,7 +240,7 @@ public class RedBlackTree<Key extends Comparable<Key>> {
 					return;
 				}
 			} 
-			
+
 			//3.2 The aunt is red
 			else if(getAunt(current).isRed) {
 				parent.isRed = false;
