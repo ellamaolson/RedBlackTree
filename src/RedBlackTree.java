@@ -5,24 +5,6 @@
 
 public class RedBlackTree<Key extends Comparable<Key>> {	
 	private static RedBlackTree.Node<String> root;//changed root to static b/c error in isLeaf()
-	
-	public static void main(String[] args) {
-		RedBlackTree<String> a = new RedBlackTree<String>();
-		a.insert("Apple");
-		a.insert("Arizona");
-		a.insert("Aaron");
-		a.insert("Banana");
-		a.insert("Carrot");
-		a.insert("Dog");
-		a.insert("Beaver");
-		a.insert("Armadillo");
-		a.insert("Gorilla");
-		System.out.println("-----------------------------------");
-		a.printTree();
-		System.out.println("-STRING----------------------------------");
-		a.toString();
-
-	}
 
 	//---------------
 	// RBT Node Class
@@ -34,11 +16,15 @@ public class RedBlackTree<Key extends Comparable<Key>> {
 		Node<String> leftChild;
 		Node<String> rightChild;
 		boolean isRed;
+	    //public int numLeft;// the number of elements to the left of each node
+	    //public int numRight; // the number of elements to the right of each node
 
 		public Node(String data){
 			this.key = data;
 			leftChild = null;
 			rightChild = null;
+			//numLeft = 0;
+			//numRight = 0;
 		}		
 
 		public int compareTo(Node<String> n) { 	//this < that  <0
@@ -67,46 +53,43 @@ public class RedBlackTree<Key extends Comparable<Key>> {
 	//Add new data to the tree, search for the node with the data, then fix the tree
 	public void insert(String data){  	//this < that  <0.  this > that  >0
 		Node<String> n = new Node<String>(data);
-		n.isRed = true;
-		Node<String> parent = null;
-
-		if (root == null) {
-			root = n;
-			System.out.println(root.key + " ("+ ifIsRed(root) + ") = root");
-		} else {
-			parent = search(root, data);
-			int compare = parent.compareTo(n);
-			if(compare < 0) {
-				if(parent.rightChild != null)
-					parent.rightChild.parent = n;
-				parent.rightChild = n;
-				System.out.println(parent.rightChild.key + " ("+ ifIsRed(parent.rightChild) + ") = rightChild of " + parent.key);
-			} else if(compare > 0) {
-				if(parent.leftChild != null)
-					parent.leftChild.parent = n;
-				parent.leftChild = n;
-				System.out.println(parent.leftChild.key + " ("+ ifIsRed(parent.leftChild) + ") = leftChild of " + parent.key);
-			}
-			n.parent = parent;
+		Node<String> y = null;
+		Node<String> x = root;
+		
+		while(x != null) {
+			y = x;
+			if(n.compareTo(x) < 0)
+				x = x.leftChild;
+			else
+				x = x.rightChild;
 		}
+
+		n.parent = y;
+		if(y == null)
+			root = n;
+		else if (n.compareTo(y) < 0)
+			y.leftChild = n;
+		else 
+			y.rightChild = n;
+
+		n.leftChild = null;
+		n.rightChild = null;
+		n.isRed = true;
 		fixTree(n);
 	}
-
+	
 	// Searches for a node with key data
-	public Node<String> search(Node<String> node, String data) {
-		int compare = 0;
-
-		if(node != null) {
-			compare = node.compareTo(new Node<String>(data));
-			if(compare < 0 && node.rightChild != null)
-				return search(node.rightChild, data);
-			else if(compare > 0 && node.leftChild != null)
-				return search(node.leftChild, data);
+	public Node<String> search(String data) {
+		Node<String> current = root;
+		while (current != null) { 
+			if (current.key.equals(data))
+				return current;
+			else if (current.key.compareTo(data) < 0)
+				current = current.rightChild;
 			else
-				return node;
+				current = current.leftChild;
 		}
-
-		return node;
+		return null;
 	}
 	
 	//Fix the tree in different cases
@@ -263,6 +246,10 @@ public class RedBlackTree<Key extends Comparable<Key>> {
 			return true;
 		return false;
 	}
+	
+	public Node<String> getRoot() {
+		return root;
+	}
 
 	//---------------
 	//Visit 
@@ -301,6 +288,21 @@ public class RedBlackTree<Key extends Comparable<Key>> {
 
 		if(n.rightChild != null)
 			preOrderVisit(n.rightChild, v);
-
 	}
+	
+	// Looks up a value in the RBTree to see if it exists
+	public Boolean lookup(String data) {
+		Node<String> current = root;
+		while (current != null){
+			if (current.key.equals(data))// return that node and exit search(int)
+				return true;
+			else if (current.key.compareTo(data) < 0)// go left or right based on value of current and key
+				current = current.rightChild;
+			else // go left or right based on value of current and key
+				current = current.leftChild;
+		}
+
+		return false; // we have not found a node whose key is "key"
+	}
+	
 }

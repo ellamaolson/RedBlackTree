@@ -8,29 +8,35 @@ import org.junit.Test;
 
 
 public class RBTTester {
-	File file;
+	File dictionary;
+	File poem;
+	SpellChecker checker;
+	RedBlackTree<String> a, b;
 
-	//	@Before
-	//	public void setUp() {
-	//		file = new File("src/dictionary.txt");
-	//		Main main = new Main(file);
-	//	}
+	@Before
+	public void setUp() {
+		dictionary = new File("src/dictionary.txt");
+		poem = new File("src/poem.txt");
+		a = new RedBlackTree<String>();
+		b = new RedBlackTree<String>();
+	}
 	//
 	@Test
 	//Test the Red Black Tree
 	public void test() {
-		RedBlackTree rbt = new RedBlackTree();
-		rbt.insert("D");
-		rbt.insert("B");
-		rbt.insert("A");
-		rbt.insert("C");
-		rbt.insert("F");
-		rbt.insert("E");
-		rbt.insert("H");
-		rbt.insert("G");
-		rbt.insert("I");
-		rbt.insert("J");
-		assertEquals("DBACFEHGIJ", makeString(rbt));
+		System.out.println("--- Red Black Tree A ---");
+		a.insert("D");
+		a.insert("B");
+		a.insert("A");
+		a.insert("C");
+		a.insert("F");
+		a.insert("E");
+		a.insert("H");
+		a.insert("G");
+		a.insert("I");
+		a.insert("J");
+		a.printTree();
+		assertEquals("DBACFEHGIJ", makeString(a));
 		String str=     "Color: 1, Key:D Parent: \n"+
 				"Color: 1, Key:B Parent: D\n"+
 				"Color: 1, Key:A Parent: B\n"+
@@ -41,38 +47,42 @@ public class RBTTester {
 				"Color: 1, Key:G Parent: H\n"+
 				"Color: 1, Key:I Parent: H\n"+
 				"Color: 0, Key:J Parent: I\n";
-		assertEquals(str, makeStringDetails(rbt));
+		assertEquals(str, makeStringDetails(a));
 	}
 
 	@Test
 	//Test Red Black Tree insert() and fixTree()
 	public void testInsert() {
-		RedBlackTree a = new RedBlackTree();
-		a.insert("Apple");
-		a.insert("Arizona");
-		a.insert("Aaron");
-		a.insert("Banana");
-		a.insert("Carrot");
-		a.insert("Dog");
-		a.insert("Beaver");
-		a.insert("Armadillo");
-		a.insert("Gorilla");
-		System.out.println("-----------------------------------");
-		a.printTree();
+		System.out.println("\n--- Red Black Tree B ---");
+		b.insert("Apple");
+		b.insert("Arizona");
+		b.insert("Aaron");
+		b.insert("Banana");
+		b.insert("Carrot");
+		b.insert("Dog");
+		b.insert("Beaver");
+		b.insert("Armadillo");
+		b.insert("Gorilla");
+		b.printTree();
 		assertEquals("BananaAppleAaronArizonaArmadilloCarrotBeaverDogGorilla", 
-				makeString(a));
-	}
-	
-	@Test
-	public void testSpellChecker() {
-		 double start = System.currentTimeMillis();
-		 double end =  System.currentTimeMillis();
-		 
-		 double time = end - start;
-		 System.out.println("Program took: " + time);
+				makeString(b));
 	}
 
-	//add tester for spell checker
+	@Test
+	public void testSpellChecker() {
+		System.out.println("\n--- Testing Spell Checker ---");
+		
+		double start = System.currentTimeMillis();
+		SpellChecker checker = new SpellChecker(dictionary, poem);
+		double end =  System.currentTimeMillis();
+		
+		double time = end - start;
+		System.out.println("Program took: " + time + "ms");
+		
+		System.out.println("Mispellings: " + checker.getMispellingCount());
+		assertEquals(81, checker.getMispellingCount());
+		
+	}
 
 	public static String makeString(RedBlackTree t) {
 		class MyVisitor implements RedBlackTree.Visitor {
